@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Tareas de Limpieza</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .date-display {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .tasks-container {
+            padding: 25px 20px;
+        }
+        
+        .task-category {
+            margin-bottom: 25px;
+        }
+        
+        .category-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f4f8;
+        }
+        
+        .category-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            color: #4b6cb7;
+        }
+        
+        .task-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+        
+        .task-item.completed {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid #94a3b8;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .task-item.completed .task-checkbox {
+            background: #10b981;
+            border-color: #10b981;
+        }
+        
+        .task-checkbox i {
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s ease;
+        }
+        
+        .task-item.completed .task-checkbox i {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .task-info {
+            flex-grow: 1;
+        }
+        
+        .task-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 3px;
+        }
+        
+        .task-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .submit-section {
+            padding: 20px;
+            background: #f1f5f9;
+            text-align: center;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(75, 108, 183, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .submit-btn i {
+            margin-left: 8px;
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .completed-count {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #475569;
+            text-align: center;
+        }
+        
+        .confirmation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .confirmation.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .confirmation-box {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+        
+        .confirmation.show .confirmation-box {
+            transform: translateY(0);
+        }
+        
+        .confirmation-box i {
+            font-size: 3.5rem;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-box h2 {
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+        
+        .confirmation-box p {
+            color: #64748b;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .spreadsheet-info {
+            background: #f8fafc;
+            border-left: 4px solid #4b6cb7;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .spreadsheet-info h3 {
+            color: #1e293b;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .spreadsheet-info h3 i {
+            margin-right: 10px;
+            color: #4b6cb7;
+        }
+        
+        .spreadsheet-info a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-all;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .spreadsheet-info a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tasks-container {
+                padding: 20px 15px;
+            }
+            
+            .submit-btn {
+                padding: 14px 35px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-broom"></i> Registro de Limpieza</h1>
+            <p>Selecciona las tareas completadas para actualizar la hoja de cálculo</p>
+            <div class="date-display">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="current-date">2 de Agosto, 2025</span>
+            </div>
+        </header>
+        
+        <div class="tasks-container">
+            <!-- Sección personalizada para mostrar la hoja de cálculo de destino -->
+            <div class="spreadsheet-info">
+                <h3><i class="fas fa-table"></i> Datos enviados a:</h3>
+                <a href="https://script.google.com/macros/s/AKfycbzeGu7jq5-bnsSvPtmezlwDIhwAnA60MMvu4IVUCqoDIf_o8WCzts50YeyIbtOt_UcB/exec">
+                    Mi Registro Personal de Limpieza
+                </a>
+            </div>
+            
+            <div class="task-category">
+                <div class="category-title">
+                    <i class="fas fa-bath"></i>
+                    <h3>Baño</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" data-task="Limpiar ducha y bañera">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Limpiar ducha y bañera</div>
+                            <div class="task-desc">Quitar residuos de jabón y moho</div>
+                        </div>
+                    </div>
+                    <div class="task-item" data-task="Desinfectar inodoro">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Desinfectar inodoro</div>
+                            <div class="task-desc">Por dentro, por fuera y detrás</div>
+                        </div>
+                    </div>
+                    <div class="task-item" data-task="Limpiar espejos y superficies">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Limpiar espejos y superficies</div>
+                            <div class="task-desc">Encimeras, lavabos y grifos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-category">
+                <div class="category-title">
+                    <i class="fas fa-utensils"></i>
+                    <h3>Cocina</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" data-task="Limpiar encimeras">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Limpiar encimeras</div>
+                            <div class="task-desc">Limpiar y desinfectar</div>
+                        </div>
+                    </div>
+                    <div class="task-item" data-task="Limpiar electrodomésticos">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Limpiar electrodomésticos</div>
+                            <div class="task-desc">Estufa, microondas y nevera</div>
+                        </div>
+                    </div>
+                    <div class="task-item" data-task="Barrer y fregar suelo">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Barrer y fregar suelo</div>
+                            <div class="task-desc">Enfócate en áreas de mucho tráfico</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-category">
+                <div class="category-title">
+                    <i class="fas fa-couch"></i>
+                    <h3>Salón</h3>
+                </div>
+                <div class="task-list">
+                    <div class="task-item" data-task="Aspirar alfombras">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Aspirar alfombras</div>
+                            <div class="task-desc">Incluye debajo de los muebles</div>
+                        </div>
+                    </div>
+                    <div class="task-item" data-task="Quitar polvo de superficies">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Quitar polvo de superficies</div>
+                            <div class="task-desc">Mesas, estanterías y electrónicos</div>
+                        </div>
+                    </div>
+                    <div class="task-item" data-task="Limpiar ventanas">
+                        <div class="task-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Limpiar ventanas</div>
+                            <div class="task-desc">Cristales interiores y marcos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress-bar"></div>
+        </div>
+        <div class="completed-count" id="completed-count">0/9 tareas completadas</div>
+        
+        <div class="submit-section">
+            <button class="submit-btn" id="submit-btn">
+                Actualizar Hoja <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="confirmation" id="confirmation">
+        <div class="confirmation-box">
+            <i class="fas fa-check-circle"></i>
+            <h2>¡Tareas Enviadas!</h2>
+            <p>Tus tareas de limpieza completadas se han registrado exitosamente en la hoja de cálculo de Google.</p>
+            
+            <!-- Sección personalizada en la confirmación -->
+            <div class="spreadsheet-info" style="margin: 15px 0; text-align: left;">
+                <h3><i class="fas fa-table"></i> Guardado en:</h3>
+                <a href="https://script.google.com/macros/s/AKfycbzeGu7jq5-bnsSvPtmezlwDIhwAnA60MMvu4IVUCqoDIf_o8WCzts50YeyIbtOt_UcB/exec" target="_blank">
+                    Mi Registro Personal de Limpieza
+                </a>
+            </div>
+            
+            <button class="submit-btn" id="close-confirmation">OK</button>
+        </div>
+    </div>
+    
+    <script>
+        // Establecer fecha actual
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
+        
+        // Funcionalidad de tareas
+        const taskItems = document.querySelectorAll('.task-item');
+        const progressBar = document.getElementById('progress-bar');
+        const completedCount = document.getElementById('completed-count');
+        const submitBtn = document.getElementById('submit-btn');
+        const confirmation = document.getElementById('confirmation');
+        const closeConfirmation = document.getElementById('close-confirmation');
+        
+        let completedTasks = [];
+        
+        taskItems.forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('completed');
+                const taskName = item.getAttribute('data-task');
+                
+                if (item.classList.contains('completed')) {
+                    if (!completedTasks.includes(taskName)) {
+                        completedTasks.push(taskName);
+                    }
+                } else {
+                    completedTasks = completedTasks.filter(task => task !== taskName);
+                }
+                
+                updateProgress();
+            });
+        });
+        
+        function updateProgress() {
+            const completed = completedTasks.length;
+            const total = taskItems.length;
+            const percentage = (completed / total) * 100;
+            
+            progressBar.style.width = `${percentage}%`;
+            completedCount.textContent = `${completed}/${total} tareas completadas`;
+            
+            submitBtn.disabled = completed === 0;
+        }
+        
+        // Función para enviar a Google Sheets
+        submitBtn.addEventListener('click', () => {
+            submitBtn.innerHTML = 'Enviando... <i class="fas fa-spinner fa-spin"></i>';
+            submitBtn.disabled = true;
+
+            // URL de tu script de Google Apps (personalízalo)
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzeGu7jq5-bnsSvPtmezlwDIhwAnA60MMvu4IVUCqoDIf_o8WCzts50YeyIbtOt_UcB/exec';
+
+            // Datos a enviar
+            const data = {
+                fecha: now.toLocaleDateString('es-ES', options),
+                tareas: completedTasks
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Google Apps Script requiere esto para respuestas simples
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(() => {
+                confirmation.classList.add('show');
+                submitBtn.innerHTML = 'Actualizar Hoja <i class="fas fa-paper-plane"></i>';
+                submitBtn.disabled = false;
+                setTimeout(() => {
+                    taskItems.forEach(item => item.classList.remove('completed'));
+                    completedTasks = [];
+                    updateProgress();
+                }, 2000);
+            }).catch(() => {
+                alert('Error al enviar los datos');
+                submitBtn.innerHTML = 'Actualizar Hoja <i class="fas fa-paper-plane"></i>';
+                submitBtn.disabled = false;
+            });
+        });
+        
+        // Cerrar confirmación
+        closeConfirmation.addEventListener('click', () => {
+            confirmation.classList.remove('show');
+        });
+        
+        // Inicializar progr
+        updateProgress();
+    </script>
+</body>
+</html>
